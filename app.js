@@ -7,6 +7,26 @@ var helmet = require('helmet');
 var session = require('express-session');
 var passport = require('passport');
 
+// モデルの読み込み
+var User = require('./models/user');
+var Schedule = require('./models/schedule');
+var Availability = require('./models/availability');
+var Candidate = require('./models/candidate');
+var Comment = require('./models/comment');
+
+//エンティティ同士の関係の定義
+User.sync().then(() => {
+  Schedule.belongsTo(User, {foreignKey: 'createdBy'});
+  Schedule.sync();
+  Comment.belongsTo(User, {foreignKey: 'userId'});
+  Comment.sync();
+  Availability.belongsTo(User, {foreignKey: 'userId'});
+  Candidate.sync().then(() => {
+    Availability.belongsTo(Candidate, {foreignKey: 'candidateId'});
+    Availability.sync();
+  });
+});
+
 var config = require('./config');
 
 var TwitterStrategy = require('passport-twitter').Strategy;
@@ -28,10 +48,13 @@ passport.use(new TwitterStrategy({
   callbackURL: TWITTER_CALLBACKURL
 },
   function (accessToken, refreshToken, profile, done) {
-    process.nextTick(function () {
-      console.log(profile);
-      return done(null, profile);
-    });
+      User.upsert({
+        userId: profile.id,
+        username: profile.username,
+        provider: 'twitter'
+      }).then(() => {
+        done(null, profile);
+      });
   }
 ));
 

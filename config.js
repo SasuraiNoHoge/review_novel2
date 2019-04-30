@@ -1,7 +1,7 @@
 module.exports = {
   twitter: {
-    consumerKey: 'GwqhnLhey22FTrgKuGfLelHGa',
-    consumerSecret: 'tkXmpC13Q2qVvEPOWpCUW2ijrKJCPDztNTxiXW3Iplnvqv3BRh',
+    consumerKey: '2aeHQgtjOTHHUhPLYJmvHw5RW',
+    consumerSecret: 'DnWYAG0BJ4fjlhoxchsXZZW7vC55nGjvHrSfV8GAzq81X1b8Ry',
     callbackURL: 'http://localhost:8000/auth/twitter/callback'
   },
   github: {
