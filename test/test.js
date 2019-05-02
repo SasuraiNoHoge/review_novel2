@@ -46,7 +46,7 @@ describe('/schedules', () => {
   before(() => {
     passportStub.install(app);
     //app.jsのTwitterStrategy内Userテーブルに挿入するタップルが必要
-    passportStub.login({ id: 0, provider: 'test', username: 'testuser' });
+    passportStub.login({ id: '0', provider: 'test', username: 'testuser' });
   });
 
   after(() => {
@@ -55,7 +55,7 @@ describe('/schedules', () => {
   });
 
   it('予定が作成でき、表示される', (done) => {
-    User.upsert({ userId: '0',provider: 'test', username: 'testuser' }).then(() => {
+    User.upsert({ userId: '0', provider: 'test', username: 'testuser' }).then(() => {
       request(app)
         .post('/schedules')
         .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3' })
@@ -81,6 +81,7 @@ describe('/schedules', () => {
               }).then((candidates) => {
                 const promises = candidates.map((c) => { return c.destroy(); });
                 Promise.all(promises).then(() => {
+                  //scheduleテーブルが削除されない
                   Schedule.findByPk(scheduleId).then((s) => { 
                     s.destroy().then(() => { 
                       if (err) return done(err);
@@ -89,7 +90,6 @@ describe('/schedules', () => {
                   });
                 });
               });
-              
             });
         });
     });

@@ -50,8 +50,8 @@ passport.use(new TwitterStrategy({
   function (accessToken, refreshToken, profile, done) {
       User.upsert({
         userId: profile.id,
+        provider: profile.provider,
         username: profile.username,
-        provider: 'twitter'
       }).then(() => {
         done(null, profile);
       });
