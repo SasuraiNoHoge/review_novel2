@@ -23,12 +23,14 @@ router.post('/', authenticationEnsurer, (req, res, next) => {
     updatedAt: updatedAt
   }).then((schedule) => {
     const candidateNames = req.body.candidates.trim().split('\n').map((s) => s.trim()).filter((s) => s !== "");
-    const candidates = candidateNames.map((c) => { return {
-      candidateName: c,
-      scheduleId: schedule.scheduleId
-    };});
+    const candidates = candidateNames.map((c) => {
+      return {
+        candidateName: c,
+        scheduleId: schedule.scheduleId
+      };
+    });
     Candidate.bulkCreate(candidates).then(() => {
-          res.redirect('/schedules/' + schedule.scheduleId);
+      res.redirect('/schedules/' + schedule.scheduleId);
     });
   });
 });
@@ -38,7 +40,7 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     include: [
       {
         model: User,
-        attributes: ['userId', 'username', 'provider']
+        attributes: ['userId','provider','username']
       }],
     where: {
       scheduleId: req.params.scheduleId
@@ -50,12 +52,12 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
         where: { scheduleId: schedule.scheduleId },
         order: [['"candidateId"', 'ASC']]
       }).then((candidates) => {
-         res.render('schedule', {
-              user: req.user,
-              schedule: schedule,
-              candidates: candidates,
-              users: [req.user]
-            });
+        res.render('schedule', {
+          user: req.user,
+          schedule: schedule,
+          candidates: candidates,
+          users: [req.user]
+        });
       });
     } else {
       const err = new Error('指定された予定は見つかりません');
@@ -64,4 +66,5 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
     }
   });
 });
+
 module.exports = router;

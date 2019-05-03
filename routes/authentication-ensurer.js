@@ -1,4 +1,3 @@
-
 'use strict';
 
 function ensure(req, res, next) {

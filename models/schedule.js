@@ -33,7 +33,7 @@ const Schedule = loader.database.define('schedules', {
     timestamps: false,
     indexes: [
       {
-        fields: ['createdBy','provider']
+        fields: ['createdBy']
       }
     ]
   });
