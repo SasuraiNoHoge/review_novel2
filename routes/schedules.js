@@ -109,7 +109,8 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           }).then((comments) => {
             const commentMap = new Map();  // key: userId, value: comment
             comments.forEach((comment) => {
-              commentMap.set(comment.userId+comment.provider, comment.comment);
+              const mapKey = comment.userId+comment.provider;
+              commentMap.set(mapKey, comment.comment);
             });
             res.render('schedule', {
               user: req.user,
