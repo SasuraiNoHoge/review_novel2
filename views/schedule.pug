@@ -14,10 +14,17 @@ block content
       tr
         th #{candidate.candidateName}
         each user in users
-          - var availability = availabilityMapMap.get(user.userId).get(candidate.candidateId)
+          - var mapMapKey = user.userId+user.provider
+          - var availability = availabilityMapMap.get(mapMapKey).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
           td
             if user.isSelf
-              button #{availabilityLabels[availability]}
+              button(
+                data-schedule-id=schedule.scheduleId
+                data-user-id=user.userId,
+                data-user-provider=user.provider,
+                data-candidate-id=candidate.candidateId
+                data-availability=availability).availability-toggle-button #{availabilityLabels[availability]}
+
             else
               p #{availabilityLabels[availability]}

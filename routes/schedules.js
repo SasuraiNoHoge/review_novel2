@@ -7,6 +7,7 @@ const Schedule = require('../models/schedule');
 const Candidate = require('../models/candidate');
 const User = require('../models/user');
 const Availability = require('../models/availability');
+const Comment = require('../models/comment');
 
 router.get('/new', authenticationEnsurer, (req, res, next) => {
   res.render('new', { user: req.user });
@@ -78,13 +79,15 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           const key = req.user.id + req.user.provider;
           userMap.set(key, {
               isSelf: true,
-              userId: key,
+              userId: req.user.id,
+              provider: req.user.provider,
               username: req.user.username
           });
           availabilities.forEach((a) => {
-            userMap.set(a.user.userId, {
+            userMap.set(a.user.userId + a.user.provider, {
               isSelf: req.user.id === a.user.userId && req.user.provider === a.user.provider, // 閲覧ユーザー自身であるかを含める
-              userId: a.user.userId+a.user.provider,
+              userId: a.user.userId,
+              provider: a.user.provider,
               username: a.user.username
             });
           });
@@ -93,19 +96,30 @@ router.get('/:scheduleId', authenticationEnsurer, (req, res, next) => {
           const users = Array.from(userMap).map((keyValue) => keyValue[1]);
           users.forEach((u) => {
             candidates.forEach((c) => {
-              const map = availabilityMapMap.get(u.userId) || new Map();
+              const mapMapKey = u.userId + u.provider;
+              const map = availabilityMapMap.get(mapMapKey) || new Map();
               const a = map.get(c.candidateId) || 0; // デフォルト値は 0 を利用
               map.set(c.candidateId, a);
-              availabilityMapMap.set(u.userId, map);
+              availabilityMapMap.set(mapMapKey, map);
             });
           });
-       
-          res.render('schedule', {
-            user: req.user,
-            schedule: schedule,
-            candidates: candidates,
-            users: users,
-            availabilityMapMap: availabilityMapMap
+          // コメント取得
+          Comment.findAll({
+            where: { scheduleId: schedule.scheduleId }
+          }).then((comments) => {
+            const commentMap = new Map();  // key: userId, value: comment
+            comments.forEach((comment) => {
+              commentMap.set(comment.userId+comment.provider, comment.comment);
+            });
+            res.render('schedule', {
+              user: req.user,
+              schedule: schedule,
+              candidates: candidates,
+              users: users,
+              availabilityMapMap: availabilityMapMap,
+              commentMap: commentMap
+            });
+
           });
         });
       });
