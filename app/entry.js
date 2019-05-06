@@ -20,7 +20,6 @@ $('.availability-toggle-button').each((i, e) => {
   });
 });
 
-
 const buttonSelfComment = $('#self-comment-button');
 buttonSelfComment.click(() => {
   const scheduleId = buttonSelfComment.data('schedule-id');

@@ -57,7 +57,7 @@ describe('/schedules', () => {
   });
 
   it('予定が作成でき、表示される', (done) => {
-    User.upsert({ userId: '0', provider: 'test', username: 'testuser' }).then(() => {
+    User.upsert({ userId: '0',provider: 'test', username: 'testuser' }).then(() => {
       request(app)
         .post('/schedules')
         .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3' })
@@ -127,7 +127,7 @@ describe('/schedules/:scheduleId/users/:userId/:provider/candidates/:candidateId
 describe('/schedules/:scheduleId/users/:userId/:provider/comments', () => {
   before(() => {
     passportStub.install(app);
-    passportStub.login({ id: '0', provider: 'test', username: 'testuser' });
+    passportStub.login({ id: '0',provider: 'test', username: 'testuser' });
   });
 
   after(() => {

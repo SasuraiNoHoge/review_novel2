@@ -14,8 +14,8 @@ block content
       tr
         th #{candidate.candidateName}
         each user in users
-          - var mapKey = user.userId+user.provider
-          - var availability = availabilityMapMap.get(mapKey).get(candidate.candidateId)
+          -var userMapKey = user.userId+user.provider
+          - var availability = availabilityMapMap.get(userMapKey).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
           td
             if user.isSelf
@@ -31,14 +31,14 @@ block content
     tr
       th コメント
       each user in users
-        -var commentMapKey = user.userId + user.provider
+        -var uMapKey = user.userId+user.provider
         if user.isSelf
           td
-            p#self-comment #{commentMap.get(commentMapKey)}
+            p#self-comment #{commentMap.get(uMapKey)}
             button(
               data-schedule-id=schedule.scheduleId
               data-user-id=user.userId
               data-user-provider=user.provider)#self-comment-button 編集
         else
           td
-            p #{commentMap.get(commentMapKey)}
+            p #{commentMap.get(uMapKey)}
