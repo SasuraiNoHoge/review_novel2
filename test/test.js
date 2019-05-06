@@ -1,11 +1,11 @@
 'use strict';
-let request = require('supertest');
+const request = require('supertest');
 const assert = require('assert');
-let app = require('../app');
-let passportStub = require('passport-stub');
-let User = require('../models/user');
-let Schedule = require('../models/schedule');
-let Candidate = require('../models/candidate');
+const app = require('../app');
+const passportStub = require('passport-stub');
+const User = require('../models/user');
+const Schedule = require('../models/schedule');
+const Candidate = require('../models/candidate');
 const Availability = require('../models/availability');
 const Comment = require('../models/comment');
 
@@ -64,7 +64,7 @@ describe('/schedules', () => {
         .expect('Location', /schedules/)
         .expect(302)
         .end((err, res) => {
-          let createdSchedulePath = res.headers.location;
+          const createdSchedulePath = res.headers.location;
           request(app)
             .get(createdSchedulePath)
             .expect(/テスト予定1/)
@@ -99,12 +99,12 @@ describe('/schedules/:scheduleId/users/:userId/:provider/candidates/:candidateId
         .end((err, res) => {
           const createdSchedulePath = res.headers.location;
           const scheduleId = createdSchedulePath.split('/schedules/')[1];
+          const userId = '0';
+          const provider = 'test';
           Candidate.findOne({
             where: { scheduleId: scheduleId }
           }).then((candidate) => {
             // 更新がされることをテスト
-            const userId = "0";
-            const provider = "test";
             request(app)
               .post(`/schedules/${scheduleId}/users/${userId}/${provider}/candidates/${candidate.candidateId}`)
               .send({ availability: 2 }) // 出席に更新
@@ -136,7 +136,7 @@ describe('/schedules/:scheduleId/users/:userId/:provider/comments', () => {
   });
 
   it('コメントが更新できる', (done) => {
-    User.upsert({ userId: '0',provider: 'test', username: 'testuser' }).then(() => {
+    User.upsert({ userId: '0', provider: 'test', username: 'testuser' }).then(() => {
       request(app)
         .post('/schedules')
         .send({ scheduleName: 'テストコメント更新予定1', memo: 'テストコメント更新メモ1', candidates: 'テストコメント更新候補1' })
@@ -154,7 +154,6 @@ describe('/schedules/:scheduleId/users/:userId/:provider/comments', () => {
               Comment.findAll({
                 where: { scheduleId: scheduleId }
               }).then((comments) => {
-                //commentsが増えない
                 assert.equal(comments.length, 1);
                 assert.equal(comments[0].comment, 'testcomment');
                 deleteScheduleAggregate(scheduleId, done, err);
