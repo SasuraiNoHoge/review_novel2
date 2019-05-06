@@ -4,7 +4,7 @@ const router = express.Router();
 const authenticationEnsurer = require('./authentication-ensurer');
 const Comment = require('../models/comment');
 
-router.post('/:scheduleId/users/:userId/provider/comments', authenticationEnsurer, (req, res, next) => {
+router.post('/:scheduleId/users/:userId/:provider/comments', authenticationEnsurer, (req, res, next) => {
   const scheduleId = req.params.scheduleId;
   const userId = req.params.userId;
   const provider = req.params.provider;

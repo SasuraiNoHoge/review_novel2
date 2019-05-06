@@ -11,7 +11,6 @@ router.post('/:scheduleId/users/:userId/:provider/candidates/:candidateId', auth
   const candidateId = req.params.candidateId;
   let availability = req.body.availability;
   availability = availability ? parseInt(availability) : 0;
-  //paramsはpost以降のオレンジ色の文字列の要素
 
   Availability.upsert({
     scheduleId: scheduleId,
