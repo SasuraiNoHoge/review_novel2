@@ -48,7 +48,7 @@ describe('/logout', () => {
 describe('/schedules', () => {
   before(() => {
     passportStub.install(app);
-    passportStub.login({ id: '0',provider: 'test', username: 'testuser' });
+    passportStub.login({ id: '0', provider: 'test', username: 'testuser' });
   });
 
   after(() => {
@@ -57,7 +57,7 @@ describe('/schedules', () => {
   });
 
   it('予定が作成でき、表示される', (done) => {
-    User.upsert({ userId: '0',provider: 'test', username: 'testuser' }).then(() => {
+    User.upsert({ userId: '0', provider: 'test', username: 'testuser' }).then(() => {
       request(app)
         .post('/schedules')
         .send({ scheduleName: 'テスト予定1', memo: 'テストメモ1\r\nテストメモ2', candidates: 'テスト候補1\r\nテスト候補2\r\nテスト候補3' })
@@ -83,7 +83,7 @@ describe('/schedules', () => {
 describe('/schedules/:scheduleId/users/:userId/:provider/candidates/:candidateId', () => {
   before(() => {
     passportStub.install(app);
-    passportStub.login({ id: '0',provider: 'test', username: 'testuser' });
+    passportStub.login({ id: '0', provider: 'test', username: 'testuser' });
   });
 
   after(() => {
@@ -92,21 +92,19 @@ describe('/schedules/:scheduleId/users/:userId/:provider/candidates/:candidateId
   });
 
   it('出欠が更新できる', (done) => {
-    User.upsert({ userId: '0',provider: 'test', username: 'testuser' }).then(() => {
+    User.upsert({ userId: '0', provider: 'test', username: 'testuser' }).then(() => {
       request(app)
         .post('/schedules')
         .send({ scheduleName: 'テスト出欠更新予定1', memo: 'テスト出欠更新メモ1', candidates: 'テスト出欠更新候補1' })
         .end((err, res) => {
           const createdSchedulePath = res.headers.location;
           const scheduleId = createdSchedulePath.split('/schedules/')[1];
-          const userId = '0';
-          const provider = 'test';
           Candidate.findOne({
             where: { scheduleId: scheduleId }
           }).then((candidate) => {
             // 更新がされることをテスト
             request(app)
-              .post(`/schedules/${scheduleId}/users/${userId}/${provider}/candidates/${candidate.candidateId}`)
+              .post(`/schedules/${scheduleId}/users/${'0'}/${'test'}/candidates/${candidate.candidateId}`)
               .send({ availability: 2 }) // 出席に更新
               .expect('{"status":"OK","availability":2}')
               .end((err, res) => {
@@ -127,7 +125,7 @@ describe('/schedules/:scheduleId/users/:userId/:provider/candidates/:candidateId
 describe('/schedules/:scheduleId/users/:userId/:provider/comments', () => {
   before(() => {
     passportStub.install(app);
-    passportStub.login({ id: '0',provider: 'test', username: 'testuser' });
+    passportStub.login({ id: '0', provider: 'test', username: 'testuser' });
   });
 
   after(() => {
@@ -144,10 +142,8 @@ describe('/schedules/:scheduleId/users/:userId/:provider/comments', () => {
           const createdSchedulePath = res.headers.location;
           const scheduleId = createdSchedulePath.split('/schedules/')[1];
           // 更新がされることをテスト
-          const userId = '0';
-          const provider = 'test';
           request(app)
-            .post(`/schedules/${scheduleId}/users/${userId}/${provider}/comments`)
+            .post(`/schedules/${scheduleId}/users/${'0'}/${'test'}/comments`)
             .send({ comment: 'testcomment' })
             .expect('{"status":"OK","comment":"testcomment"}')
             .end((err, res) => {
@@ -163,7 +159,6 @@ describe('/schedules/:scheduleId/users/:userId/:provider/comments', () => {
     });
   });
 });
-
 
 function deleteScheduleAggregate(scheduleId, done, err) {
   const promiseCommentDestroy = Comment.findAll({
