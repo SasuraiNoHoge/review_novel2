@@ -4,6 +4,10 @@ block content
   h4 #{schedule.scheduleName}
   p(style="white-space:pre;") #{schedule.memo}
   p 作成者: #{schedule.user.username}
+  - var isMine = user.id === schedule.user.userId
+  if isMine
+    div
+      a(href=`/schedules/${schedule.scheduleId}/edit`) この予定を編集する
   h3 出欠表
   table
     tr
@@ -14,8 +18,8 @@ block content
       tr
         th #{candidate.candidateName}
         each user in users
-          -var userMapKey = user.userId+user.provider
-          - var availability = availabilityMapMap.get(userMapKey).get(candidate.candidateId)
+          - var uMapKey = user.userId + user.provider;
+          - var availability = availabilityMapMap.get(uMapKey).get(candidate.candidateId)
           - var availabilityLabels = ['欠', '？', '出'];
           td
             if user.isSelf
@@ -25,20 +29,21 @@ block content
                 data-user-provider=user.provider
                 data-candidate-id=candidate.candidateId
                 data-availability=availability).availability-toggle-button #{availabilityLabels[availability]}
-
             else
               p #{availabilityLabels[availability]}
     tr
       th コメント
       each user in users
-        -var uMapKey = user.userId+user.provider
-        if user.isSelf
+        - var userMapKey = user.userId + user.provider;
+        - console.log("ログ")
+        - console.log(userMapKey)
+        if user.isSelf 
           td
-            p#self-comment #{commentMap.get(uMapKey)}
+            p#self-comment #{commentMap.get(userMapKey)}
             button(
               data-schedule-id=schedule.scheduleId
               data-user-id=user.userId
               data-user-provider=user.provider)#self-comment-button 編集
         else
           td
-            p #{commentMap.get(uMapKey)}
+            p #{commentMap.get(userMapKey)}

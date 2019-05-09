@@ -43,6 +43,7 @@ passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
 
+
 passport.use(new TwitterStrategy({
   consumerKey: TWITTER_CONSUMER_KEY,
   consumerSecret: TWITTER_CONSUMER_SECRET,
@@ -58,6 +59,7 @@ passport.use(new TwitterStrategy({
       });
   }
 ));
+
 
 var indexRouter = require('./routes/index');
 var loginRouter = require('./routes/login');
