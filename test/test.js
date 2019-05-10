@@ -26,7 +26,7 @@ describe('/login', () => {
     request(app)
       .get('/login')
       .expect('Content-Type', 'text/html; charset=utf-8')
-      .expect(/<a href="\/auth\/twitter"/)
+      .expect(/<a class="btn btn-info my-3" href="\/auth\/twitter"/)
       .expect(200, done);
   });
 

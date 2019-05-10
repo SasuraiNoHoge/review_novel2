@@ -1,6 +1,4 @@
 extends layout
 
 block content
-  a(href="/auth/twitter") Twitterでログイン
-  if user
-     p 現在 #{user.username} でログイン中
+  a(href="/auth/twitter").btn.btn-info.my-3 Twitterでログイン
