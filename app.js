@@ -24,14 +24,19 @@ User.sync().then(() => {
   });
 });
 
-//var config = require('./config');
+var config = require('./config');
 
 var TwitterStrategy = require('passport-twitter').Strategy;
-// var TWITTER_CONSUMER_KEY = config.twitter.consumerKey;
-// var TWITTER_CONSUMER_SECRET = config.twitter.consumerSecret;
-// var TWITTER_CALLBACKURL = config.twitter.callbackURL;
-var TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
-var TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
+var TWITTER_CONSUMER_KEY = config.twitter.consumerKey;
+var TWITTER_CONSUMER_SECRET = config.twitter.consumerSecret;
+var TWITTER_CALLBACKURL = config.twitter.callbackURL;
+// var TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
+// var TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
+
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
+var GOOGLE_CLIENT_ID = config.google.clientID;
+var GOOGLE_CLIENT_SECRET = config.google.clientSecret;
+var GOOGLE_CALLBACKURL = config.google.callbackURL;
 
 var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = '2f831cb3d4aac02393aa';
@@ -45,11 +50,30 @@ passport.deserializeUser(function (obj, done) {
   done(null, obj);
 });
 
+passport.use(new GoogleStrategy({
+  clientID: GOOGLE_CLIENT_ID,
+  clientSecret: GOOGLE_CLIENT_SECRET,
+  callbackURL: 'http://localhost:8000/auth/google/callback'
+},
+  function (accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+      User.upsert({
+        userId: profile.id,
+        provider: 'google',
+        username: profile.displayName
+      }).then(() => {
+        done(null, profile);
+      });
+    });
+  }
+));
+
 
 passport.use(new TwitterStrategy({
   consumerKey: TWITTER_CONSUMER_KEY,
   consumerSecret: TWITTER_CONSUMER_SECRET,
-  callbackURL: process.env.HEROKU_URL + 'auth/twitter/callback'
+  callbackURL: config.TWITTER_CALLBACKURL
+  // callbackURL: process.env.HEROKU_URL + 'auth/twitter/callback'
 },
   function (accessToken, refreshToken, profile, done) {
       User.upsert({
@@ -113,6 +137,27 @@ function (req, res) {
       res.redirect('/');
     }
 });
+
+//google outh
+app.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile'] }),
+  function (req, res) {
+  });
+
+app.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: '/login' }),
+  function (req, res) {
+    var loginFrom = req.cookies.loginFrom;
+    // オープンリダイレクタ脆弱性対策
+    if (loginFrom &&
+      !loginFrom.includes('http://') &&
+      !loginFrom.includes('https://')) {
+      res.clearCookie('loginFrom');
+      res.redirect(loginFrom);
+    } else {
+      res.redirect('/');
+    }
+  });
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
