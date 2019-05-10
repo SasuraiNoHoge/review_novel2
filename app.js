@@ -24,12 +24,14 @@ User.sync().then(() => {
   });
 });
 
-var config = require('./config');
+//var config = require('./config');
 
 var TwitterStrategy = require('passport-twitter').Strategy;
-var TWITTER_CONSUMER_KEY = config.twitter.consumerKey;
-var TWITTER_CONSUMER_SECRET = config.twitter.consumerSecret;
-var TWITTER_CALLBACKURL = config.twitter.callbackURL;
+// var TWITTER_CONSUMER_KEY = config.twitter.consumerKey;
+// var TWITTER_CONSUMER_SECRET = config.twitter.consumerSecret;
+// var TWITTER_CALLBACKURL = config.twitter.callbackURL;
+var TWITTER_CONSUMER_KEY = process.env.TWITTER_CONSUMER_KEY;
+var TWITTER_CONSUMER_SECRET = process.env.TWITTER_CONSUMER_SECRET;
 
 var GitHubStrategy = require('passport-github2').Strategy;
 var GITHUB_CLIENT_ID = '2f831cb3d4aac02393aa';
@@ -47,7 +49,7 @@ passport.deserializeUser(function (obj, done) {
 passport.use(new TwitterStrategy({
   consumerKey: TWITTER_CONSUMER_KEY,
   consumerSecret: TWITTER_CONSUMER_SECRET,
-  callbackURL: TWITTER_CALLBACKURL
+  callbackURL: process.env.HEROKU_URL + 'auth/twitter/callback'
 },
   function (accessToken, refreshToken, profile, done) {
       User.upsert({
